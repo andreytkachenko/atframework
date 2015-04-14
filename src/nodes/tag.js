@@ -17,6 +17,12 @@ ATF.invoke(['$directiveProvider', 'utils'], function ($directiveProvider, utils)
                     }, function (value) {
                         elem.setAttribute(key, value);
                     });
+                } else if (typeof value === 'function') {
+                    scope.$watch(function (scope) {
+                        return value(scope);
+                    }, function (value) {
+                        elem.setAttribute(key, value);
+                    });
                 } else {
                     elem.setAttribute(key, value);
                 }
