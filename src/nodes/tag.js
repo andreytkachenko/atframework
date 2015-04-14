@@ -9,17 +9,17 @@ ATF.invoke(['$directiveProvider', 'utils'], function ($directiveProvider, utils)
 
             utils.each(args[0], function (value, key) {
                 var expr;
-                if (utils.isExpr(value)) {
+                if (typeof value === 'function') {
+                    scope.$watch(function (scope) {
+                        return value(scope);
+                    }, function (value) {
+                        elem.setAttribute(key, value);
+                    });
+                } else if (utils.isExpr(value)) {
                     expr = utils.expr(value);
 
                     scope.$watch(function (scope) {
                         return expr(scope);
-                    }, function (value) {
-                        elem.setAttribute(key, value);
-                    });
-                } else if (typeof value === 'function') {
-                    scope.$watch(function (scope) {
-                        return value(scope);
                     }, function (value) {
                         elem.setAttribute(key, value);
                     });
