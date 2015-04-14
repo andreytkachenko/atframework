@@ -15,9 +15,9 @@ module.exports = function (grunt) {
                     'src/annotations/altimage.js',
                     'src/annotations/on.js',
                     'src/annotations/setproperty.js',
-                    'src/node/text.js',
-                    'src/node/tag.js',
-                    'src/node/each.js'
+                    'src/nodes/text.js',
+                    'src/nodes/tag.js',
+                    'src/nodes/each.js'
                 ],
                 dest: 'dist/atframework.js'
             }
