@@ -1,0 +1,21 @@
+{
+  "name": "atframework",
+  "version": "0.0.0",
+  "homepage": "https://github.com/andreytkachenko/atframework",
+  "authors": [
+    "Andrey Tkachenko"
+  ],
+  "description": "AT Framework (Lite AngularJS)",
+  "main": "dist/atframework.js",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "~2.1.3"
+  }
+}
