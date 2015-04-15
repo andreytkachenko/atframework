@@ -643,7 +643,7 @@ ATF.invoke(['$directiveProvider', 'utils'], function ($directiveProvider, utils)
 
             if (utils.isExpr(expr)) {
                 scope.$watch(function (scope) {
-                    return utils.expr(expr)(scope, vars);
+                    return utils.expr(expr).call(node, scope, vars);
                 }, function (val) {
                     node.nodeValue = val;
                 })
@@ -675,7 +675,7 @@ ATF.invoke(['$directiveProvider', 'utils'], function ($directiveProvider, utils)
                     expr = utils.expr(value);
 
                     scope.$watch(function (scope) {
-                        return expr(scope, vars);
+                        return expr.call(elem, scope, vars);
                     }, function (value) {
                         elem.setAttribute(key, value);
                     });

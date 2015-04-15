@@ -10,7 +10,7 @@ ATF.invoke(['$directiveProvider', 'utils'], function ($directiveProvider, utils)
 
             if (utils.isExpr(expr)) {
                 scope.$watch(function (scope) {
-                    return utils.expr(expr)(scope, vars);
+                    return utils.expr(expr).call(node, scope, vars);
                 }, function (val) {
                     node.nodeValue = val;
                 })
