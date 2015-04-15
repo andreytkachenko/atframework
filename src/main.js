@@ -192,9 +192,3 @@ ATF.factory('$hash', [], function () {
         }
     };
 });
-
-ATF.config('jQuery', jQuery);
-
-$(document).ready(function () {
-    ATF.init();
-});
