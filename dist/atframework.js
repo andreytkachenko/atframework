@@ -1,6 +1,5 @@
 /*! AtFramework | Andrey Tkachenko | MIT License | github.com/andreytkachenko/atframework */
 
-
 var ATF = {
     runindex: 0,
     dependencies: {},
@@ -192,12 +191,6 @@ ATF.factory('$hash', [], function () {
             }
         }
     };
-});
-
-ATF.config('jQuery', jQuery);
-
-$(document).ready(function () {
-    ATF.init();
 });;/*! AtFramework | Andrey Tkachenko | MIT License | github.com/andreytkachenko/atframework */
 
 ATF.factory('utils', [], function () {
@@ -489,7 +482,7 @@ ATF.factory('$template', ['$directiveProvider'], function ($directiveProvider) {
         },
 
 
-        render: function (scope) {
+        render: function (scope, vars) {
             var children = function (dir, scope) {
                 var _scope = scope;
 
@@ -506,11 +499,11 @@ ATF.factory('$template', ['$directiveProvider'], function ($directiveProvider) {
                     });
                 };
 
-                var $el = dir.directive.controller.link(dir.directive.name, _scope, _children, dir.args);
+                var $el = dir.directive.controller.link(dir.directive.name, _scope, _children, dir.args, vars);
 
                 if (dir.annotations) {
                     dir.annotations.reverse().forEach(function (obj) {
-                        $el = obj.directive.controller.link(obj.name, $el, _scope, obj.args);
+                        $el = obj.directive.controller.link(obj.name, $el, _scope, obj.args, vars);
                     });
                 }
 
@@ -564,7 +557,8 @@ ATF.factory('$template', ['$directiveProvider'], function ($directiveProvider) {
 
 ATF.invoke(['$directiveProvider', 'utils'], function ($directiveProvider, utils) {
     $directiveProvider.register('$Accessor', {
-        link: function (name, $el, scope, args) {
+        link: function (name, $el, scope, args, vars) {
+            var __vars = vars || {};
             if (!args[0] || !args[1]) {
                 return $el;
             }
@@ -573,11 +567,10 @@ ATF.invoke(['$directiveProvider', 'utils'], function ($directiveProvider, utils)
             var valueExpr = utils.eval(args[1]);
 
             scope.$watch(function () {
-                return accessorExpr.call($el, {});
+                return accessorExpr.call($el, scope, __vars);
             }, function (value) {
-                valueExpr.call($el, scope, {
-                    $value: value
-                });
+                __vars.$value = value;
+                valueExpr.call($el, scope, __vars);
             });
 
             return $el;
@@ -587,7 +580,7 @@ ATF.invoke(['$directiveProvider', 'utils'], function ($directiveProvider, utils)
  * Created by tkachenko on 14.04.15.
  */
 
-ATF.invoke(['$directiveProvider'], function ($directiveProvider) {
+ATF.invoke(['$directiveProvider', 'jQuery'], function ($directiveProvider, $) {
     $directiveProvider.register('$AltImage', {
         link: function (name, el, scope, args) {
             var $el = $(el);
@@ -611,9 +604,10 @@ ATF.invoke(['$directiveProvider'], function ($directiveProvider) {
  */
 
 
-ATF.invoke(['$directiveProvider', 'utils'], function ($directiveProvider, utils) {
+ATF.invoke(['$directiveProvider', 'utils', 'jQuery'], function ($directiveProvider, utils, $) {
     $directiveProvider.register('$On', {
-        link: function (name, $el, scope, args) {
+        link: function (name, $el, scope, args, vars) {
+            var __vars = vars||{};
             if (!args[0] || !args[1]) {
                 return $el;
             }
@@ -627,13 +621,13 @@ ATF.invoke(['$directiveProvider', 'utils'], function ($directiveProvider, utils)
             }
 
             $($el).on(eventName, function ($event) {
+                __vars.$event = $event;
+
                 if (args[2] || eventName === 'click') {
                     $event.preventDefault();
                 }
 
-                expr.call(this, scope, {
-                    $event: $event
-                });
+                expr.call(this, scope, __vars);
 
                 if (apply) {
                     scope.$apply();
@@ -649,14 +643,15 @@ ATF.invoke(['$directiveProvider', 'utils'], function ($directiveProvider, utils)
 
 ATF.invoke(['$directiveProvider', 'utils'], function ($directiveProvider, utils) {
     $directiveProvider.register('$SetProperty', {
-        link: function (name, $el, scope, args) {
+        link: function (name, $el, scope, args, vars) {
+            var __vars = vars || {};
             if (!args[0] || !args[1]) {
                 return $el;
             }
             var expr = utils.eval(args[1]);
 
             scope.$watch(function (scope) {
-                return expr(scope);
+                return expr(scope, __vars);
             }, function (value) {
                 var val = $el[args[0]];
                 if (val !== value) {
@@ -673,13 +668,13 @@ ATF.invoke(['$directiveProvider', 'utils'], function ($directiveProvider, utils)
 
 ATF.invoke(['$directiveProvider', 'utils'], function ($directiveProvider, utils) {
     $directiveProvider.register('text', {
-        link: function (name, scope, children, args) {
+        link: function (name, scope, children, args, vars) {
             var expr = args[0];
             var node = document.createTextNode('');
 
             if (utils.isExpr(expr)) {
                 scope.$watch(function (scope) {
-                    return utils.expr(expr)(scope);
+                    return utils.expr(expr)(scope, vars);
                 }, function (val) {
                     node.nodeValue = val;
                 })
@@ -696,7 +691,7 @@ ATF.invoke(['$directiveProvider', 'utils'], function ($directiveProvider, utils)
 
 ATF.invoke(['$directiveProvider', 'utils'], function ($directiveProvider, utils) {
     var tagController = {
-        link: function (name, scope, children, args) {
+        link: function (name, scope, children, args, vars) {
             var elem = document.createElement(name);
 
             utils.each(args[0], function (value, key) {
@@ -711,7 +706,7 @@ ATF.invoke(['$directiveProvider', 'utils'], function ($directiveProvider, utils)
                     expr = utils.expr(value);
 
                     scope.$watch(function (scope) {
-                        return expr(scope);
+                        return expr(scope, vars);
                     }, function (value) {
                         elem.setAttribute(key, value);
                     });
@@ -738,7 +733,7 @@ ATF.invoke(['$directiveProvider', 'utils'], function ($directiveProvider, utils)
 ATF.invoke(['$directiveProvider', 'utils'], function ($directiveProvider, utils) {
     $directiveProvider.register('each', {
         scope: true,
-        link: function (name, scope, children, args) {
+        link: function (name, scope, children, args, vars) {
             if (args.length < 2 || args.length > 3) {
                 throw Error('Repeat: Invalid number of arguments!');
             }
@@ -749,11 +744,11 @@ ATF.invoke(['$directiveProvider', 'utils'], function ($directiveProvider, utils)
             var element = document.createDocumentFragment();
 
             scope.$watch(function (scope) {
-                return sourceVarExpr(scope).length;
+                return sourceVarExpr(scope, vars).length;
             }, function () {
                 var frag = document.createDocumentFragment();
 
-                utils.each(sourceVarExpr(scope), function (value, key) {
+                utils.each(sourceVarExpr(scope, vars), function (value, key) {
                     var subScope = scope.$new();
                     subScope[localVarName] = value;
                     if (indexVarName) {
