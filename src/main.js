@@ -1,11 +1,17 @@
 /*! AtFramework | Andrey Tkachenko | MIT License | github.com/andreytkachenko/atframework */
 
 var ATF = {
+    initialized: false,
     runindex: 0,
     dependencies: {},
+    invoking: [],
 
     invoke: function (deps, func) {
-        return func.apply(null, this.resolve(deps));
+        if (this.initialized) {
+            func.apply(null, this.resolve(deps));
+        } else {
+            this.invoking.push(arguments);
+        }
     },
 
     resolve: function (deps) {
@@ -129,6 +135,14 @@ var ATF = {
             item.resolving = false;
             item.resolved = true;
         };
+
+        this.initialized = true;
+
+        if (this.invoking.length) {
+            for (var i=0; i < this.invoking.length; i++) {
+                this.invoke.apply(this, this.invoking[i]);
+            }
+        }
 
         for (var i in this.dependencies) {
             if (this.dependencies.hasOwnProperty(i)) {
