@@ -3,9 +3,10 @@
  */
 
 
-ATF.invoke(['$directiveProvider', 'utils'], function ($directiveProvider, utils) {
+ATF.invoke(['$directiveProvider', 'utils', 'jQuery'], function ($directiveProvider, utils, $) {
     $directiveProvider.register('$On', {
-        link: function (name, $el, scope, args) {
+        link: function (name, $el, scope, args, vars) {
+            var __vars = vars||{};
             if (!args[0] || !args[1]) {
                 return $el;
             }
@@ -19,13 +20,13 @@ ATF.invoke(['$directiveProvider', 'utils'], function ($directiveProvider, utils)
             }
 
             $($el).on(eventName, function ($event) {
+                __vars.$event = $event;
+
                 if (args[2] || eventName === 'click') {
                     $event.preventDefault();
                 }
 
-                expr.call(this, scope, {
-                    $event: $event
-                });
+                expr.call(this, scope, __vars);
 
                 if (apply) {
                     scope.$apply();

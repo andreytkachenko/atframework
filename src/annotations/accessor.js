@@ -4,7 +4,8 @@
 
 ATF.invoke(['$directiveProvider', 'utils'], function ($directiveProvider, utils) {
     $directiveProvider.register('$Accessor', {
-        link: function (name, $el, scope, args) {
+        link: function (name, $el, scope, args, vars) {
+            var __vars = vars || {};
             if (!args[0] || !args[1]) {
                 return $el;
             }
@@ -13,11 +14,10 @@ ATF.invoke(['$directiveProvider', 'utils'], function ($directiveProvider, utils)
             var valueExpr = utils.eval(args[1]);
 
             scope.$watch(function () {
-                return accessorExpr.call($el, {});
+                return accessorExpr.call($el, scope, __vars);
             }, function (value) {
-                valueExpr.call($el, scope, {
-                    $value: value
-                });
+                __vars.$value = value;
+                valueExpr.call($el, scope, __vars);
             });
 
             return $el;

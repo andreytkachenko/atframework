@@ -5,7 +5,7 @@
 ATF.invoke(['$directiveProvider', 'utils'], function ($directiveProvider, utils) {
     $directiveProvider.register('if', {
         scope: false,
-        link: function (name, scope, children, args) {
+        link: function (name, scope, children, args, vars) {
             if(args.length !== 1) {
                 throw Error('Repeat: Invalid number of arguments!');
             }
@@ -15,7 +15,7 @@ ATF.invoke(['$directiveProvider', 'utils'], function ($directiveProvider, utils)
             var _children = null;
 
             scope.$watch(function (scope) {
-                return conditionExpr(scope);
+                return conditionExpr(scope, vars);
             }, function (value) {
                 if (value) {
                     _children = children(scope);

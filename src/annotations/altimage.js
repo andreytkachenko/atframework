@@ -2,7 +2,7 @@
  * Created by tkachenko on 14.04.15.
  */
 
-ATF.invoke(['$directiveProvider'], function ($directiveProvider) {
+ATF.invoke(['$directiveProvider', 'jQuery'], function ($directiveProvider, $) {
     $directiveProvider.register('$AltImage', {
         link: function (name, el, scope, args) {
             var $el = $(el);

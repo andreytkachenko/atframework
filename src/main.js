@@ -1,6 +1,5 @@
 /*! AtFramework | Andrey Tkachenko | MIT License | github.com/andreytkachenko/atframework */
 
-
 var ATF = {
     runindex: 0,
     dependencies: {},

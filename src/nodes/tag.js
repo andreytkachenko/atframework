@@ -4,7 +4,7 @@
 
 ATF.invoke(['$directiveProvider', 'utils'], function ($directiveProvider, utils) {
     var tagController = {
-        link: function (name, scope, children, args) {
+        link: function (name, scope, children, args, vars) {
             var elem = document.createElement(name);
 
             utils.each(args[0], function (value, key) {
@@ -19,7 +19,7 @@ ATF.invoke(['$directiveProvider', 'utils'], function ($directiveProvider, utils)
                     expr = utils.expr(value);
 
                     scope.$watch(function (scope) {
-                        return expr(scope);
+                        return expr(scope, vars);
                     }, function (value) {
                         elem.setAttribute(key, value);
                     });

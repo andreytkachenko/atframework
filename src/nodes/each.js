@@ -5,7 +5,7 @@
 ATF.invoke(['$directiveProvider', 'utils'], function ($directiveProvider, utils) {
     $directiveProvider.register('each', {
         scope: true,
-        link: function (name, scope, children, args) {
+        link: function (name, scope, children, args, vars) {
             if (args.length < 2 || args.length > 3) {
                 throw Error('Repeat: Invalid number of arguments!');
             }
@@ -16,11 +16,11 @@ ATF.invoke(['$directiveProvider', 'utils'], function ($directiveProvider, utils)
             var element = document.createDocumentFragment();
 
             scope.$watch(function (scope) {
-                return sourceVarExpr(scope).length;
+                return sourceVarExpr(scope, vars).length;
             }, function () {
                 var frag = document.createDocumentFragment();
 
-                utils.each(sourceVarExpr(scope), function (value, key) {
+                utils.each(sourceVarExpr(scope, vars), function (value, key) {
                     var subScope = scope.$new();
                     subScope[localVarName] = value;
                     if (indexVarName) {

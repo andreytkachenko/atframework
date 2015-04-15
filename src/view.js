@@ -56,7 +56,7 @@ ATF.factory('$template', ['$directiveProvider'], function ($directiveProvider) {
         },
 
 
-        render: function (scope) {
+        render: function (scope, vars) {
             var children = function (dir, scope) {
                 var _scope = scope;
 
@@ -73,11 +73,11 @@ ATF.factory('$template', ['$directiveProvider'], function ($directiveProvider) {
                     });
                 };
 
-                var $el = dir.directive.controller.link(dir.directive.name, _scope, _children, dir.args);
+                var $el = dir.directive.controller.link(dir.directive.name, _scope, _children, dir.args, vars);
 
                 if (dir.annotations) {
                     dir.annotations.reverse().forEach(function (obj) {
-                        $el = obj.directive.controller.link(obj.name, $el, _scope, obj.args);
+                        $el = obj.directive.controller.link(obj.name, $el, _scope, obj.args, vars);
                     });
                 }
 

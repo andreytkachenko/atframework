@@ -4,13 +4,13 @@
 
 ATF.invoke(['$directiveProvider', 'utils'], function ($directiveProvider, utils) {
     $directiveProvider.register('text', {
-        link: function (name, scope, children, args) {
+        link: function (name, scope, children, args, vars) {
             var expr = args[0];
             var node = document.createTextNode('');
 
             if (utils.isExpr(expr)) {
                 scope.$watch(function (scope) {
-                    return utils.expr(expr)(scope);
+                    return utils.expr(expr)(scope, vars);
                 }, function (val) {
                     node.nodeValue = val;
                 })
