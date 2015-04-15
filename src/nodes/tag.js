@@ -11,7 +11,7 @@ ATF.invoke(['$directiveProvider', 'utils'], function ($directiveProvider, utils)
                 var expr;
                 if (typeof value === 'function') {
                     scope.$watch(function (scope) {
-                        return value(scope);
+                        return value.call(elem, scope);
                     }, function (value) {
                         elem.setAttribute(key, value);
                     });
