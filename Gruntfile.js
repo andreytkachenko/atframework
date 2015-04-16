@@ -12,6 +12,7 @@ module.exports = function (grunt) {
                     'src/annotation.js',
                     'src/view.js',
                     'src/annotations/accessor.js',
+                    'src/annotations/watch.js',
                     'src/annotations/altimage.js',
                     'src/annotations/on.js',
                     'src/annotations/setproperty.js',
