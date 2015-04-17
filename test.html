@@ -3,17 +3,20 @@
 <head lang="en">
     <meta charset="UTF-8">
     <title>AT Framework Tests</title>
-    <script src="src/main.js"></script>
+    <script src="dist/atframework.js"></script>
 </head>
 <body>
     <script>
         (function () {
             var value;
+            ATF.init();
 
             console.log('Begin Tests');
             console.log('Dependency Injection');
 
             // TEST 1
+            ATF.reset();
+            value = '';
 
             ATF.factory('test4', ['test3'], function (test3) { return test3+'test4'; });
             ATF.factory('test3', ['test2'], function (test2) { return test2+'test3'; });
@@ -110,6 +113,26 @@
 
             ATF.value('test1', 'test1');
             console.log('Dependency Injection Test 5', value === 'test1invoked');
+
+            // TEST 6
+            ATF.reset();
+            value = '';
+
+            ATF.factory('fac1', ['test1', 'unknown'], function (test1) {
+                value += test1 + 'invoked';
+            });
+
+            ATF.factory('fac2', ['test1'], function (test1) {
+                value += test1 + 'invoked';
+            });
+
+            ATF.factory('test1', ['unexisted'], function () {
+                value += test1 + 'invoked';
+            });
+
+            ATF.init();
+
+            console.log('Dependency Injection Test 6', value === '');
         })();
     </script>
 </body>

@@ -52,7 +52,7 @@ var ATF = {
 
             item = dependencies[name];
 
-            if (visited[name])
+            if (item.resolving)
                 throw Error('Recursive dependency');
 
             visited[name] = true;
@@ -60,6 +60,8 @@ var ATF = {
             if (item.resolved) {
                 return true;
             }
+
+            item.resolving = true;
 
             if (item.deps) {
                 for (var i = 0; i < item.deps.length; i++) {
