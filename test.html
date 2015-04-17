@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>AT Framework Tests</title>
+    <script src="src/main.js"></script>
+</head>
+<body>
+    <script>
+        (function () {
+            var value;
+
+            console.log('Begin Tests');
+            console.log('Dependency Injection');
+
+            // TEST 1
+
+            ATF.factory('test4', ['test3'], function (test3) { return test3+'test4'; });
+            ATF.factory('test3', ['test2'], function (test2) { return test2+'test3'; });
+            ATF.factory('test2', ['test1'], function (test1) { return test1+'test2'; });
+            ATF.factory('test1', [], function () { return 'test1'; });
+
+            ATF.run(['test4'], function (test4) {
+                console.log('Dependency Injection Test 1', test4 === 'test1test2test3test4');
+            });
+
+            ATF.init();
+
+            // TEST 2
+            ATF.reset();
+            value = '';
+
+
+            ATF.invoke(['test1'], function (test1) {
+                value += 'invoke2';
+            }, true);
+
+            ATF.invoke(['test1'], function (test1) {
+                value += 'invoke1';
+            });
+
+            ATF.factory('test1', [], function () {
+                return 'test1';
+            });
+
+            ATF.init();
+
+            console.log('Dependency Injection Test 2', value === 'invoke1invoke2');
+
+            // TEST 3
+            ATF.reset();
+            value = '';
+
+            ATF.value('test1', 'test1');
+
+            ATF.invoke(['test1'], function (test1) {
+                value += test1 + 'invoked';
+            });
+
+            console.log('Dependency Injection Test 3', value === 'test1invoked');
+
+            // TEST 4
+            ATF.reset();
+            value = '';
+            var value1 = '';
+            var value2 = '';
+
+            ATF.factory('fac1', null, function () {
+                value1 += 'fac';
+
+                return value1;
+            });
+
+            ATF.service('ser1', null, function () {
+                value2 += 'ser';
+
+                return value2;
+            });
+
+            ATF.invoke(['fac1'], function (fac1) {
+                value += fac1;
+            });
+
+            ATF.invoke(['fac1'], function (fac1) {
+                value += fac1;
+            });
+
+            ATF.invoke(['ser1'], function (fac1) {
+                value += fac1;
+            });
+
+            ATF.invoke(['ser1'], function (fac1) {
+                value += fac1;
+            });
+
+            console.log('Dependency Injection Test 4', value === 'facfacfacserser');
+
+
+            // TEST 5
+            ATF.reset();
+            value = '';
+
+            ATF.invoke(['test1'], function (test1) {
+                value += test1 + 'invoked';
+            });
+
+            ATF.init();
+
+            console.log('Dependency Injection Test 5', value === '');
+
+            ATF.value('test1', 'test1');
+            console.log('Dependency Injection Test 5', value === 'test1invoked');
+        })();
+    </script>
+</body>
+</html>
