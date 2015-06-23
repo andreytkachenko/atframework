@@ -745,10 +745,11 @@ ATF.invoke(['$directiveProvider', 'utils'], function ($directiveProvider, utils)
         }
     };
 
-    ['div', 'em', 'span', 'a', 'img', 'video', 'ul', 'li', 'p'].forEach(function (tag) {
+    ['div', 'em', 'span', 'a', 'img', 'video', 'ul', 'li', 'p', 'iframe'].forEach(function (tag) {
         $directiveProvider.register(tag, tagController);
     });
-});;/**
+});
+;/**
  * Created by tkachenko on 14.04.15.
  */
 
