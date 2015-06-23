@@ -18,7 +18,8 @@ module.exports = function (grunt) {
                     'src/annotations/setproperty.js',
                     'src/nodes/text.js',
                     'src/nodes/tag.js',
-                    'src/nodes/each.js'
+                    'src/nodes/each.js',
+                    'src/nodes/if.js'
                 ],
                 dest: 'dist/atframework.js'
             }
