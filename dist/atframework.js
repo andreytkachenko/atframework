@@ -247,7 +247,16 @@ ATF.factory('utils', [], function () {
                 }
 
                 return dotIndex === -1 ? obj[_path] : __lens__(obj[_path.substr(0, dotIndex)], _path.substr(dotIndex + 1));
-            }
+            };
+        },
+        
+        params: function (hash, keyDelim, itemDelim, encode) {
+            keyDelim = typeof keyDelim === "string" ? keyDelim : '='; 
+            itemDelim = typeof itemDelim === "string" ? itemDelim : '&'; 
+            
+            return this.each(hash, function (value, key) {
+                this.push(key + keyDelim + (encode ? encodeURIComponent(value) : value));
+            }, []).join(itemDelim);
         }
     }
 });;/*! AtFramework | Andrey Tkachenko | MIT License | github.com/andreytkachenko/atframework */
