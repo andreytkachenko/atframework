@@ -179,6 +179,10 @@ var ATF = {
         if (this.pending.length) {
             this.invokePending();
         }
+        
+        this.invoke(['$rootScope'], function ($rootScope) {
+            $rootScope.$apply();
+        });
     },
     reset: function () {
         this.dependencies = {};
@@ -745,7 +749,7 @@ ATF.invoke(['$directiveProvider', 'utils'], function ($directiveProvider, utils)
         }
     };
 
-    ['div', 'em', 'span', 'a', 'img', 'video', 'ul', 'li', 'p', 'iframe'].forEach(function (tag) {
+    ['div', 'em', 'span', 'a', 'img', 'video', 'ul', 'li', 'p', 'i', 'iframe'].forEach(function (tag) {
         $directiveProvider.register(tag, tagController);
     });
 });

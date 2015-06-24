@@ -179,6 +179,10 @@ var ATF = {
         if (this.pending.length) {
             this.invokePending();
         }
+        
+        this.invoke(['$rootScope'], function ($rootScope) {
+            $rootScope.$apply();
+        });
     },
     reset: function () {
         this.dependencies = {};
