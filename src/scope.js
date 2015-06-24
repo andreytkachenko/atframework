@@ -40,7 +40,7 @@ ATF.factory('RootScope', ['jQuery', '$scopeFactory', 'utils'],
 
                 if (broadcast) {
                     if (this.hasOwnProperty('$$children') && this.$$children.length) {
-                        for (i = 0; i < this.$$children[name].length; i++) {
+                        for (i = 0; i < this.$$children.length; i++) {
                             this.$$children[i]._trigger.call(this.$$children[i], name, true, args);
                         }
                     }
