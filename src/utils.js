@@ -1,6 +1,6 @@
 /*! AtFramework | Andrey Tkachenko | MIT License | github.com/andreytkachenko/atframework */
 
-ATF.factory('utils', [], function () {
+ATF.factory('utils', ['jQuery'], function ($) {
     return {
         isExpr: function (value) {
             return value.match(/({{.*?}})/) ? true : false;
