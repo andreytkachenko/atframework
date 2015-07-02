@@ -19,7 +19,9 @@ module.exports = function (grunt) {
                     'src/nodes/text.js',
                     'src/nodes/tag.js',
                     'src/nodes/each.js',
-                    'src/nodes/if.js'
+                    'src/nodes/if.js',
+                    'src/nodes/input.js',
+                    'src/nodes/select.js'
                 ],
                 dest: 'dist/atframework.js'
             }

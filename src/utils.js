@@ -7,24 +7,34 @@ ATF.factory('utils', ['jQuery'], function ($) {
         },
 
         eval: function (__js) {
-            return function (__data, __vars) {
-                var __result, $self = __data;
-                with (__vars||{}) {
-                    with (__data) {
-                        try {
-                            __result = eval(__js);
-                        } catch (e) {
-                            console.warn(e.message);
-                            console.warn(e.stack);
+            if (typeof __js === 'string') {
+                return function (__data, __vars) {
+                    var __result, $self = __data;
+                    with (__vars||{}) {
+                        with (__data) {
+                            try {
+                                __result = eval(__js);
+                            } catch (e) {
+                                console.warn(e.message);
+                                console.warn(e.stack);
+                            }
                         }
                     }
-                }
-                return __result;
-            };
+                    return __result;
+                };
+            } else if (typeof __js === 'function') {
+                return function (__data, __vars) {
+                    return __js.call(this, __data, __vars||{});
+                };
+            } else {
+                return function (__data, __vars) {
+                    return __js;
+                };
+            }
         },
 
         expr: function (__value) {
-            return this.eval('"' + __value.replace(/{{(.*?)}}/g, '" + ($1) + "') + '"')
+            return this.eval('"' + __value.replace(/{{(.*?)}}/g, '" + ($1) + "') + '"');
         },
 
         each: function (arr, callback, context) {
@@ -66,6 +76,10 @@ ATF.factory('utils', ['jQuery'], function ($) {
             return this.each(hash, function (value, key) {
                 this.push(key + keyDelim + (encode ? encodeURIComponent(value) : value));
             }, []).join(itemDelim);
+        },
+        
+        extend: function () {
+            return $.extend.apply($, arguments);
         }
     }
 });

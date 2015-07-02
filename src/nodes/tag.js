@@ -36,7 +36,7 @@ ATF.invoke(['$directiveProvider', 'utils'], function ($directiveProvider, utils)
         }
     };
 
-    ['div', 'em', 'span', 'a', 'img', 'video', 'ul', 'li', 'p', 'i', 'iframe'].forEach(function (tag) {
+    ['div', 'em', 'span', 'a', 'img', 'video', 'ul', 'li', 'p', 'i', 'iframe', 'form', 'dl', 'dt', 'dd', 'button'].forEach(function (tag) {
         $directiveProvider.register(tag, tagController);
     });
 });

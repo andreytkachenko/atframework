@@ -191,31 +191,41 @@ var ATF = {
     }
 };;/*! AtFramework | Andrey Tkachenko | MIT License | github.com/andreytkachenko/atframework */
 
-ATF.factory('utils', [], function () {
+ATF.factory('utils', ['jQuery'], function ($) {
     return {
         isExpr: function (value) {
             return value.match(/({{.*?}})/) ? true : false;
         },
 
         eval: function (__js) {
-            return function (__data, __vars) {
-                var __result, $self = __data;
-                with (__vars||{}) {
-                    with (__data) {
-                        try {
-                            __result = eval(__js);
-                        } catch (e) {
-                            console.warn(e.message);
-                            console.warn(e.stack);
+            if (typeof __js === 'string') {
+                return function (__data, __vars) {
+                    var __result, $self = __data;
+                    with (__vars||{}) {
+                        with (__data) {
+                            try {
+                                __result = eval(__js);
+                            } catch (e) {
+                                console.warn(e.message);
+                                console.warn(e.stack);
+                            }
                         }
                     }
-                }
-                return __result;
-            };
+                    return __result;
+                };
+            } else if (typeof __js === 'function') {
+                return function (__data, __vars) {
+                    return __js.call(this, __data, __vars||{});
+                };
+            } else {
+                return function (__data, __vars) {
+                    return __js;
+                };
+            }
         },
 
         expr: function (__value) {
-            return this.eval('"' + __value.replace(/{{(.*?)}}/g, '" + ($1) + "') + '"')
+            return this.eval('"' + __value.replace(/{{(.*?)}}/g, '" + ($1) + "') + '"');
         },
 
         each: function (arr, callback, context) {
@@ -257,6 +267,10 @@ ATF.factory('utils', [], function () {
             return this.each(hash, function (value, key) {
                 this.push(key + keyDelim + (encode ? encodeURIComponent(value) : value));
             }, []).join(itemDelim);
+        },
+        
+        extend: function () {
+            return $.extend.apply($, arguments);
         }
     }
 });;/*! AtFramework | Andrey Tkachenko | MIT License | github.com/andreytkachenko/atframework */
@@ -758,7 +772,7 @@ ATF.invoke(['$directiveProvider', 'utils'], function ($directiveProvider, utils)
         }
     };
 
-    ['div', 'em', 'span', 'a', 'img', 'video', 'ul', 'li', 'p', 'i', 'iframe'].forEach(function (tag) {
+    ['div', 'em', 'span', 'a', 'img', 'video', 'ul', 'li', 'p', 'i', 'iframe', 'form', 'dl', 'dt', 'dd', 'button'].forEach(function (tag) {
         $directiveProvider.register(tag, tagController);
     });
 });
@@ -842,6 +856,130 @@ ATF.invoke(['$directiveProvider', 'utils'], function ($directiveProvider, utils)
             });
 
             return element;
+        }
+    });
+});;/* 
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+ATF.invoke(['$directiveProvider', 'utils'], function ($directiveProvider, utils) {
+    $directiveProvider.register('textbox', {
+        link: function (name, scope, children, args, vars) {
+            var elem = document.createElement('INPUT');
+            elem.setAttribute('type', 'text');
+            
+            var model = utils.eval(args[1]);
+            
+            scope.$watch(function (scope) {
+                return model.call(elem, scope, utils.extend({$value: undefined}, vars, {$value: undefined}));
+            }, function (val) {
+                elem.value = val;
+            });
+            
+            utils.each(args[0], function (value, key) {
+                var expr;
+                if (typeof value === 'function') {
+                    scope.$watch(function (scope) {
+                        return value.call(elem, scope);
+                    }, function (value) {
+                        elem.setAttribute(key, value);
+                    });
+                } else if (utils.isExpr(value)) {
+                    expr = utils.expr(value);
+
+                    scope.$watch(function (scope) {
+                        return expr.call(elem, scope, vars);
+                    }, function (value) {
+                        elem.setAttribute(key, value);
+                    });
+                } else {
+                    elem.setAttribute(key, value);
+                }
+            });
+            
+            var listener = function () {
+                model.call(elem, scope, utils.extend({}, vars, {$value: elem.value}));
+                scope.$apply();
+            };
+            
+            if (elem.addEventListener) {
+                elem.addEventListener('change', listener);
+                elem.addEventListener('keyup', listener);
+            } else if (elem.attachEvent) {
+                elem.attachEvent('onkeyup', listener);
+                elem.attachEvent('onchange', listener);
+            }
+            
+            return elem;
+        }
+    });
+});
+;/* 
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+ATF.invoke(['$directiveProvider', 'utils'], function ($directiveProvider, utils) {
+    $directiveProvider.register('select', {
+        link: function (name, scope, children, args, vars) {
+            var select = document.createElement('SELECT');
+            var hash = args[1] || [];
+            var model = utils.eval(args[2]);
+            var docFrag = document.createDocumentFragment();
+            
+            scope.$watch(function (scope) {
+                return model.call(select, scope, utils.extend({$value: undefined}, vars, {$value: undefined}));
+            }, function (val) {
+                select.value = val;
+            });
+            
+            utils.each(args[0], function (value, key) {
+                var expr;
+                if (typeof value === 'function') {
+                    scope.$watch(function (scope) {
+                        return value.call(select, scope);
+                    }, function (value) {
+                        select.setAttribute(key, value);
+                    });
+                } else if (utils.isExpr(value)) {
+                    expr = utils.expr(value);
+
+                    scope.$watch(function (scope) {
+                        return expr.call(select, scope, vars);
+                    }, function (value) {
+                        select.setAttribute(key, value);
+                    });
+                } else {
+                    select.setAttribute(key, value);
+                }
+            });
+            
+            utils.each(hash, function (value, key) {
+                var option = document.createElement('OPTION');
+                option.setAttribute("value", key);
+                option.innerText = value;
+                
+                this.appendChild(option);
+            }, docFrag);
+            
+            select.appendChild(docFrag);
+            
+            if (select.addEventListener) {
+                select.addEventListener('change', function () {
+                    model.call(select, scope, utils.extend({}, vars, {$value: select.value}));
+                    scope.$apply();
+                });
+            } else if (select.attachEvent) {
+                select.attachEvent('onchange', function () {
+                    model.call(select, scope, utils.extend({}, vars, {$value: select.value}));
+                    scope.$apply();
+                });
+            }
+            
+            return select;
         }
     });
 });
